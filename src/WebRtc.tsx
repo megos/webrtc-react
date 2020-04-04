@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react'
+import { usePeer } from './usePeer'
 
 const WebRtc: React.FC = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null)
   const theirVideoRef = useRef<HTMLVideoElement | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const peer = usePeer()
 
   useEffect(() => {
     navigator.mediaDevices
