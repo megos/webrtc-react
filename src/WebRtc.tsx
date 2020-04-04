@@ -5,18 +5,23 @@ const WebRtc: React.FC = () => {
   const myVideoRef = useRef<HTMLVideoElement | null>(null)
   const theirVideoRef = useRef<HTMLVideoElement | null>(null)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const peer = usePeer()
+  const peer = usePeer('1')
 
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
-        if (myVideoRef?.current) {
-          myVideoRef.current.srcObject = stream
-        }
+        myVideoRef.current!.srcObject = stream
       })
       .catch((e) => setErrorMessage(e))
-  }, [])
+
+    peer?.on('call', (call) => {
+      call.answer(myVideoRef?.current?.srcObject as MediaStream)
+      call.on('stream', (stream) => {
+        theirVideoRef.current!.srcObject = stream
+      })
+    })
+  }, [peer])
 
   return (
     <>
