@@ -1,11 +1,11 @@
 import Peer from 'skyway-js'
 import { useEffect, useRef, useState } from 'react'
 
-export function usePeer(id: string) {
+export function usePeer() {
   const ref = useRef<Peer | null>(null)
   const [peer, setPeer] = useState<Peer | null>(null)
   useEffect(() => {
-    ref.current = new Peer(id, {
+    ref.current = new Peer({
         key: process.env.REACT_APP_SKYWAY_KEY ?? 'PLEASE SET SKYWAY_KEY',
         debug: 3,
       })
