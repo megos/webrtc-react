@@ -7,10 +7,15 @@ export const VideoStream: React.FC<VideoHTMLAttributes<HTMLVideoElement> & { str
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
   useEffect(() => {
-    if (stream && videoRef.current) {
-      videoRef.current.srcObject = stream
-      // TODO: DOMException: The play() request was interrupted by a new load request.
-      videoRef.current.play().catch(console.error)
+    if (videoRef.current) {
+      if (stream) {
+        videoRef.current.srcObject = stream
+        // TODO: DOMException: The play() request was interrupted by a new load request.
+        videoRef.current.play().catch(console.error)
+      } else {
+        (videoRef.current.srcObject as MediaStream | null)?.getTracks().forEach(track => track.stop())
+        videoRef.current.srcObject = null
+      }
     }
   }, [stream])
 
