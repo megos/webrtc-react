@@ -1,31 +1,31 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { usePeer } from './usePeer'
 import { MeshRoom, RoomStream } from 'skyway-js'
-import RemoteVideo from './RemoveVideo'
+import { VideoStream } from './VideoStream'
 
 const WebRtc: React.FC = () => {
-  const myVideoRef = useRef<HTMLVideoElement | null>(null)
+  const [myStream, setMyStream] = useState<MediaStream | undefined>(undefined)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const roomRef = useRef<MeshRoom | null>(null)
+  const roomRef = useRef<MeshRoom | undefined>(undefined)
   const [remoteStreams, setRemoteStreams] = useState(new Map<string, RoomStream>())
   const peer = usePeer()
 
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((stream) => {
-        myVideoRef.current!.srcObject = stream
-      })
-      .catch((e) => setErrorMessage(e))
-  }, [peer])
+    if (!myStream) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then(setMyStream)
+        .catch(setErrorMessage)
+    }
+  }, [myStream, peer])
 
 
   const handleJoinRoom = () => {
-    roomRef!.current = peer!.joinRoom('roomName', {
+    roomRef.current = peer?.joinRoom<MeshRoom>('roomName', {
       mode: 'mesh',
-      stream: myVideoRef.current!.srcObject as MediaStream,
-    }) as MeshRoom
-    roomRef.current.on('stream',  (stream) => {
+      stream: myStream,
+    })
+    roomRef.current?.on('stream',  (stream) => {
       setRemoteStreams(streams => {
         streams.set(stream.peerId, stream)
           return new Map(streams)
@@ -37,9 +37,9 @@ const WebRtc: React.FC = () => {
     <>
       <div>{errorMessage}</div>
       <button onClick={handleJoinRoom}>join room</button>
-      <video ref={myVideoRef} muted playsInline autoPlay />
+      <VideoStream stream={myStream} muted />
       {[...remoteStreams.values()].map((stream)  => {
-        return <RemoteVideo key={stream.peerId} stream={stream} />
+        return <VideoStream key={stream.peerId} stream={stream} />
       })}
     </>
   )
