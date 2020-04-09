@@ -13,7 +13,7 @@ export const VideoStream: React.FC<VideoHTMLAttributes<HTMLVideoElement> & { str
         // TODO: DOMException: The play() request was interrupted by a new load request.
         videoRef.current.play().catch(console.error)
       } else {
-        (videoRef.current.srcObject as MediaStream | null)?.getTracks().forEach(track => track.stop())
+        ;(videoRef.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
         videoRef.current.srcObject = null
       }
     }

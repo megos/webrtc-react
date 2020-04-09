@@ -13,7 +13,7 @@ export const AudioStream: React.FC<AudioHTMLAttributes<HTMLAudioElement> & { str
         // TODO: DOMException: The play() request was interrupted by a new load request.
         audioRef.current.play().catch(console.error)
       } else {
-        (audioRef.current.srcObject as MediaStream | null)?.getTracks().forEach(track => track.stop())
+        ;(audioRef.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
         audioRef.current.srcObject = null
       }
     }
