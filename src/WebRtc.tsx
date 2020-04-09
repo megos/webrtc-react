@@ -11,34 +11,42 @@ const WebRtc: React.FC = () => {
   const peer = usePeer()
 
   useEffect(() => {
-    if (!myStream) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then(setMyStream)
-        .catch(setErrorMessage)
-    }
-  }, [myStream, peer])
-
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(setMyStream).catch(setErrorMessage)
+  }, [])
 
   const handleJoinRoom = () => {
     roomRef.current = peer?.joinRoom<MeshRoom>('roomName', {
       mode: 'mesh',
       stream: myStream,
     })
-    roomRef.current?.on('stream',  (stream) => {
-      setRemoteStreams(streams => {
+    roomRef.current?.on('stream', (stream) => {
+      setRemoteStreams((streams) => {
         streams.set(stream.peerId, stream)
-          return new Map(streams)
+        return new Map(streams)
       })
     })
+    roomRef.current?.on('peerLeave', (peerId) => {
+      setRemoteStreams((streams) => {
+        streams.delete(peerId)
+        return new Map(streams)
+      })
+    })
+  }
+
+  const handleLeaveRoom = () => {
+    roomRef.current?.close()
+    setRemoteStreams(new Map())
   }
 
   return (
     <>
       <div>{errorMessage}</div>
-      <button onClick={handleJoinRoom}>join room</button>
+      <div>
+        <button onClick={handleJoinRoom}>join room</button>
+        <button onClick={handleLeaveRoom}>leave room</button>
+      </div>
       <VideoStream stream={myStream} muted />
-      {[...remoteStreams.values()].map((stream)  => {
+      {[...remoteStreams.values()].map((stream) => {
         return <VideoStream key={stream.peerId} stream={stream} />
       })}
     </>
