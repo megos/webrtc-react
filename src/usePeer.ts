@@ -10,7 +10,7 @@ export function usePeer() {
         debug: 3,
       })
     setPeer(ref.current)
-    return () => ref?.current?.destroy()
+    return () => ref.current?.destroy()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return peer
 }
