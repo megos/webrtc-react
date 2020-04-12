@@ -20,15 +20,13 @@ const WebRtc: React.FC = () => {
       stream: myStream,
     })
     roomRef.current?.on('stream', (stream) => {
-      setRemoteStreams((streams) => {
-        streams.set(stream.peerId, stream)
-        return new Map(streams)
-      })
+      setRemoteStreams((streams) => new Map(streams).set(stream.peerId, stream))
     })
     roomRef.current?.on('peerLeave', (peerId) => {
       setRemoteStreams((streams) => {
-        streams.delete(peerId)
-        return new Map(streams)
+        const ss = new Map(streams)
+        ss.delete(peerId)
+        return ss
       })
     })
   }
