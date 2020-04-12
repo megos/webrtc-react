@@ -6,6 +6,7 @@ import { VideoStream } from './VideoStream'
 const WebRtc: React.FC = () => {
   const [myStream, setMyStream] = useState<MediaStream | undefined>(undefined)
   const [log, setLog] = useState<string[]>([])
+  const [text, setText] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const roomRef = useRef<MeshRoom | undefined>(undefined)
   const [remoteStreams, setRemoteStreams] = useState(new Map<string, RoomStream>())
@@ -52,6 +53,11 @@ const WebRtc: React.FC = () => {
     setRemoteStreams(new Map())
   }
 
+  const handleSendData = () => {
+    roomRef.current?.send(text)
+    setText('')
+  }
+
   return (
     <>
       <div>{errorMessage}</div>
@@ -63,6 +69,8 @@ const WebRtc: React.FC = () => {
       <div>
         <button onClick={handleJoinRoom}>join room</button>
         <button onClick={handleLeaveRoom}>leave room</button>
+        <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
+        <button onClick={handleSendData}>send data</button>
       </div>
       <VideoStream stream={myStream} muted />
       {[...remoteStreams.values()].map((stream) => {
