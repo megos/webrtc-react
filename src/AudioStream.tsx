@@ -4,20 +4,26 @@ export const AudioStream: React.FC<AudioHTMLAttributes<HTMLAudioElement> & { str
   stream,
   ...props
 }) => {
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const ref = useRef<HTMLAudioElement | null>(null)
+
+  const destory = () => {
+    ;(ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+    if (ref.current) ref.current.srcObject = null
+  }
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (ref.current) {
       if (stream) {
-        audioRef.current.srcObject = stream
-        // TODO: DOMException: The play() request was interrupted by a new load request.
-        audioRef.current.play().catch(console.error)
+        ref.current.srcObject = stream
+        ref.current.play().catch(console.error)
       } else {
-        ;(audioRef.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
-        audioRef.current.srcObject = null
+        ;(ref.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+        ref.current.srcObject = null
       }
     }
   }, [stream])
 
-  return <audio ref={audioRef} controls playsInline autoPlay {...props} />
+  useEffect(() => destory, [])
+
+  return <audio ref={ref} controls playsInline autoPlay {...props} />
 }

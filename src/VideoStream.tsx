@@ -4,20 +4,26 @@ export const VideoStream: React.FC<VideoHTMLAttributes<HTMLVideoElement> & { str
   stream,
   ...props
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const ref = useRef<HTMLVideoElement | null>(null)
+
+  const destory = () => {
+    ;(ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+    if (ref.current) ref.current.srcObject = null
+  }
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (ref.current) {
       if (stream) {
-        videoRef.current.srcObject = stream
+        ref.current.srcObject = stream
         // TODO: DOMException: The play() request was interrupted by a new load request.
-        videoRef.current.play().catch(console.error)
+        ref.current.play().catch(console.error)
       } else {
-        ;(videoRef.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
-        videoRef.current.srcObject = null
+        destory()
       }
     }
   }, [stream])
 
-  return <video ref={videoRef} playsInline autoPlay {...props} />
+  useEffect(() => destory, [])
+
+  return <video ref={ref} playsInline autoPlay {...props} />
 }
