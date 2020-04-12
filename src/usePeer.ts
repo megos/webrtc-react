@@ -1,15 +1,17 @@
-import Peer from 'skyway-js'
+import Peer, { PeerConstructorOption } from 'skyway-js'
 import { useEffect, useRef } from 'react'
 
-export function usePeer() {
+const options: PeerConstructorOption = {
+  key: process.env.REACT_APP_SKYWAY_KEY ?? 'PLEASE SET SKYWAY_KEY',
+  debug: process.env.NODE_ENV === 'development' ? 3 : 0,
+}
+
+export function usePeer(id?: string) {
   const ref = useRef<Peer | null>(null)
   useEffect(() => {
-    ref.current = new Peer({
-      key: process.env.REACT_APP_SKYWAY_KEY ?? 'PLEASE SET SKYWAY_KEY',
-      debug: process.env.NODE_ENV === 'development' ? 3 : 0,
-    })
+    ref.current = id ? new Peer(id, options) : new Peer(options)
     return () => ref.current?.destroy()
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return ref.current
 }
 
