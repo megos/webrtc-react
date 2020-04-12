@@ -6,16 +6,17 @@ import { VideoStream } from './VideoStream'
 const WebRtc: React.FC = () => {
   const [myStream, setMyStream] = useState<MediaStream | undefined>(undefined)
   const [log, setLog] = useState<string[]>([])
+  const [messages, setMessages] = useState<string[]>([])
   const [text, setText] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const roomRef = useRef<MeshRoom | undefined>(undefined)
   const [remoteStreams, setRemoteStreams] = useState(new Map<string, RoomStream>())
   const peer = usePeer()
 
-  const pushLog = (message: string) => setLog((l) => l.concat([message]))
+  const pushMessage = (message: string) => setMessages((m) => m.concat([message]))
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(setMyStream).catch(setErrorMessage)
+    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(setMyStream).catch(setErrorMessage)
   }, [])
 
   const handleJoinRoom = () => {
@@ -25,8 +26,8 @@ const WebRtc: React.FC = () => {
     })
     const room = roomRef.current
     if (room) {
-      room.once('open', () => pushLog('Room joined.'))
-      room.on('peerJoin', (peerId) => pushLog(`Joined ${peerId}.`))
+      room.once('open', () => pushMessage('Room joined.'))
+      room.on('peerJoin', (peerId) => pushMessage(`Joined ${peerId}.`))
       room.on('peerLeave', (peerId) => {
         setRemoteStreams((streams) => {
           const ss = new Map(streams)
@@ -35,16 +36,19 @@ const WebRtc: React.FC = () => {
         })
       })
       room.on('log', (logs) => {
-        logs.forEach((log) => {
-          const { messageType, message, timestamp } = JSON.parse(log)
-          pushLog(`${messageType} ${timestamp} ${message}`)
-        })
+        setLog(
+          logs.map((log) => {
+            const { messageType, message, timestamp } = JSON.parse(log)
+            // TODO: message type is Object
+            return `${messageType} ${timestamp} ${message}`
+          })
+        )
       })
       room.on('stream', (stream) => {
         setRemoteStreams((streams) => new Map(streams).set(stream.peerId, stream))
       })
-      room.on('data', ({ src: srcPeerId, data }) => pushLog(`Received message from ${srcPeerId}, ${data}`))
-      room.on('close', () => pushLog('Room leaved.'))
+      room.on('data', ({ src: srcPeerId, data }) => pushMessage(`Received message from ${srcPeerId}, ${data}`))
+      room.on('close', () => pushMessage('Room leaved.'))
     }
   }
 
@@ -58,9 +62,19 @@ const WebRtc: React.FC = () => {
     setText('')
   }
 
+  const handleGetLog = () => {
+    roomRef.current?.getLog()
+  }
+
   return (
     <>
       <div>{errorMessage}</div>
+      <div>
+        {messages.map((m, index) => (
+          <div key={index}>{m}</div>
+        ))}
+      </div>
+
       <div>
         {log.map((l, index) => (
           <div key={index}>{l}</div>
@@ -71,6 +85,7 @@ const WebRtc: React.FC = () => {
         <button onClick={handleLeaveRoom}>leave room</button>
         <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
         <button onClick={handleSendData}>send data</button>
+        <button onClick={handleGetLog}>get log</button>
       </div>
       <VideoStream stream={myStream} muted />
       {[...remoteStreams.values()].map((stream) => {
