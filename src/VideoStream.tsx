@@ -15,7 +15,6 @@ export const VideoStream: React.FC<VideoHTMLAttributes<HTMLVideoElement> & { str
     if (ref.current) {
       if (stream) {
         ref.current.srcObject = stream
-        // TODO: DOMException: The play() request was interrupted by a new load request.
         ref.current.play().catch(console.error)
       } else {
         destory()

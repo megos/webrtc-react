@@ -16,7 +16,7 @@ const WebRtc: React.FC = () => {
   const pushMessage = (message: string) => setMessages((m) => m.concat([message]))
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(setMyStream).catch(setErrorMessage)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(setMyStream).catch(setErrorMessage)
   }, [])
 
   const handleJoinRoom = () => {
