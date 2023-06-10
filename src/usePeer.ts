@@ -2,7 +2,7 @@ import Peer, { PeerConstructorOption } from 'skyway-js'
 import { useEffect, useRef } from 'react'
 
 const options: PeerConstructorOption = {
-  key: process.env.REACT_APP_SKYWAY_KEY ?? 'PLEASE SET SKYWAY_KEY',
+  key: import.meta.env.VITE_SKYWAY_KEY ?? 'PLEASE SET SKYWAY_KEY',
   debug: process.env.NODE_ENV === 'development' ? 3 : 0,
 }
 

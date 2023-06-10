@@ -7,7 +7,7 @@ export const AudioStream: React.FC<AudioHTMLAttributes<HTMLAudioElement> & { str
   const ref = useRef<HTMLAudioElement | null>(null)
 
   const destory = () => {
-    ;(ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+    (ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
     if (ref.current) ref.current.srcObject = null
   }
 
@@ -17,7 +17,7 @@ export const AudioStream: React.FC<AudioHTMLAttributes<HTMLAudioElement> & { str
         ref.current.srcObject = stream
         ref.current.play().catch(console.error)
       } else {
-        ;(ref.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+        (ref.current.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
         ref.current.srcObject = null
       }
     }

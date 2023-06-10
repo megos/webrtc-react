@@ -7,7 +7,7 @@ export const VideoStream: React.FC<VideoHTMLAttributes<HTMLVideoElement> & { str
   const ref = useRef<HTMLVideoElement | null>(null)
 
   const destory = () => {
-    ;(ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
+    (ref.current?.srcObject as MediaStream | null)?.getTracks().forEach((track) => track.stop())
     if (ref.current) ref.current.srcObject = null
   }
 
