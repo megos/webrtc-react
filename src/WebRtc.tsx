@@ -16,7 +16,9 @@ const WebRtc: React.FC = () => {
   const pushMessage = (message: string) => setMessages((m) => m.concat([message]))
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(setMyStream).catch(setErrorMessage)
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(setMyStream).catch(e => {
+      setErrorMessage((e as Error).toString())
+    })
   }, [])
 
   const handleJoinRoom = () => {
@@ -39,8 +41,7 @@ const WebRtc: React.FC = () => {
         setLog(
           logs.map((log) => {
             const { messageType, message, timestamp } = JSON.parse(log)
-            // TODO: message type is Object
-            return `${messageType} ${timestamp} ${message}`
+            return `${messageType} ${timestamp} ${JSON.stringify(message)}`
           })
         )
       })
